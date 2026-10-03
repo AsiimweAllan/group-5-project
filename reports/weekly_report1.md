@@ -21,6 +21,8 @@ Design and Implementation of Data Visualization Library in C++
 5. Lena Stacy - Work on histograms feature and start initial code
 6. Kabayaga Davinah - Work on countplot feature
 7. Kasai Hawla - Cleaning data received from in take to perform calculations on it
+8. Ainebyoona Joshua - Incharge of carrying out tests, since code hasnt been sufficiently created, this part comes in next week
+
 
 #Challenges experienced
 1. We found it very difficult to start the project because of limited knowledge on C++ reusable library creationand little experience in software develoment.
