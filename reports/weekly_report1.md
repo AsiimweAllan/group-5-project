@@ -22,6 +22,7 @@ Design and Implementation of Data Visualization Library in C++
 6. Kabayaga Davinah - Work on countplot feature
 7. Kasai Hawla - Cleaning data received from in take to perform calculations on it
 8. Ainebyoona Joshua - Incharge of carrying out tests, since code hasnt been sufficiently created, this part comes in next week
+9. Agola Jolly Martha - Incharge of writing out examples to demonstrate library usage, starts next week
 
 
 #Challenges experienced
