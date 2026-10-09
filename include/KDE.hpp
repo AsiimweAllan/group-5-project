@@ -1,5 +1,5 @@
-#ifndef KDE_H
-#define KDE_H
+#ifndef KDE_HPP
+#define KDE_HPP
 
 #include <vector>
 // KDE = Kernel Density Estimation

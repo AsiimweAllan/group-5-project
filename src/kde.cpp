@@ -1,4 +1,4 @@
-#include "KDE.h"
+#include "KDE.hpp"
 #include <cmath>
 #include <stdexcept> // works on invalid inputs like 0.
 constexpr double PI = 3.14159;

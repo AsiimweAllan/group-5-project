@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "KDE.h"
+#include "KDE.hpp"
 
 int main() {
     // Example dataset.
