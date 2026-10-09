@@ -25,3 +25,44 @@ double KDE::evaluate(double x) const {
     }
     return sum / (data.size() * bandwidth); // apply the KDE normalization factor 1/ (n * h).
 }
+
+std::vector<std::pair<double, double>> KDE::evaluateRange(
+    double start,
+    double end,
+    double step
+) const
+{
+    // Store all the (x, density) coordinate pairs here.
+    std::vector<std::pair<double, double>> results;
+
+    // The step must be positive.
+    if (step <= 0)
+    {
+        throw std::invalid_argument("Step must be greater than 0.");
+    }
+
+    // The ending x-value cannot be less than the starting x-value.
+    if (end < start)
+    {
+        throw std::invalid_argument("End must be greater than or equal to start.");
+    }
+
+    // A loop to start at the first x-value and move across the range.
+    
+    // Calculate the number of intervals in the requested range.
+    double intervalCount = (end - start) / step;
+
+    // Generate each x-value using its index.
+    for (int i = 0; i <= intervalCount; ++i)
+    {
+        double x = start + i * step;
+
+        // Calculate the density at this x-value.
+        double density = evaluate(x);
+
+        // Store the coordinate pair.
+        results.push_back({x, density});
+    }
+
+    return results;
+}
