@@ -10,7 +10,7 @@ int main() {
     Axis.axisLabel = "Score";
 
     // Add numbers and labels
-    Axis.ticks = {0, 20, 40, 60, 80, 100};
+    
     Axis.labels = {"0", "20", "40", "60", "80", "100"};
 
     // Display everything on screen
