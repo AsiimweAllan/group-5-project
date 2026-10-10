@@ -12,5 +12,11 @@ add_executable(kde_example
     src/kde.cpp
 )
 
+add_executable(kde_test
+    tests/KDE_plot_test.cpp
+    src/kde.cpp
+)
+
 enable_testing()
 add_test(NAME kde_example_runs COMMAND kde_example)
+add_test(NAME kde_unit_test COMMAND kde_test)
