@@ -6,6 +6,8 @@
 
 class AxisData {
 private:
+// Defining astructure to hold the axis data
+struct AxisData {
     double minValue;
     double maxValue;
     std::string axisLabel;
@@ -30,5 +32,9 @@ public:
 
 void printAxis(const AxisData& axis);
 double scaleValue(const AxisData& axis, double value);
+};
+
+//prints the axis details to the terminal
+void printAxis(const AxisData& axis);
 
 #endif
