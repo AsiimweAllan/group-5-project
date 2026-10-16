@@ -4,16 +4,32 @@
 #include <string>
 #include <vector>
 
-// Defining astructure to hold the axis data
-struct AxisData {
+class AxisData {
+private:
     double minValue;
     double maxValue;
     std::string axisLabel;
     std::vector<double> ticks;
     std::vector<std::string> labels;
+
+public:
+    AxisData();
+
+    void setRange(double min, double max);
+    void setAxisLabel(const std::string& label);
+    void setTicks(const std::vector<double>& values);
+    void setLabels(const std::vector<std::string>& values);
+
+    double getMinValue() const;
+    double getMaxValue() const;
+    std::string getAxisLabel() const;
+
+    const std::vector<double>& getTicks() const;
+    const std::vector<std::string>& getLabels() const;
 };
 
 //prints the axis details to the terminal
 void printAxis(const AxisData& axis);
+double scaleValue(const AxisData& axis, double value);
 
 #endif
