@@ -30,6 +30,17 @@ Grid load_from_text(const string& name, const string& contents) {
 }  // namespace
 
 int main() {
+    const Grid fixture = load_csv_data("scores.csv");
+    assert(fixture.size() == 5);
+    assert(fixture[0] == (vector<string>{"name", "score", "group"}));
+    assert(fixture[1] == (vector<string>{"Ada", "91", "A"}));
+    assert(fixture[4] == (vector<string>{"Dina", "64", "C"}));
+    cout << "Loaded CSV fixture (name, score, group):\n";
+    for (size_t row = 1; row < fixture.size(); ++row) {
+        cout << fixture[row][0] << ", " << fixture[row][1] << ", " << fixture[row][2] << '\n';
+    }
+    cout << "Data loader fixture test passed.\n";
+
     {
         ostringstream captured;
         streambuf* old_buf = cerr.rdbuf(captured.rdbuf());
@@ -86,10 +97,15 @@ int main() {
     assert(quoted[0][0] == "\"a");
     assert(quoted[0][1] == "b\"");
 
-    // Current behavior: CRLF leaves '\r' on the last field.
+    // The loader opens files in text mode: Windows translates CRLF, while
+    // Unix preserves the carriage return in the final field.
     const Grid crlf = load_from_text("tmp_crlf.csv", "a,b\r\nc,d\r\n");
     assert(crlf.size() == 2);
+#ifdef _WIN32
+    assert(crlf[0][1] == "b");
+#else
     assert(crlf[0][1] == "b\r");
+#endif
 
     return 0;
 }
