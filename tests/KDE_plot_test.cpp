@@ -1,4 +1,4 @@
-#include "KDE.h"
+#include "KDE.hpp"
 
 #include <cassert>
 #include <cmath>
