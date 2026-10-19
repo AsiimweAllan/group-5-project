@@ -1,43 +1,45 @@
-#include <iostream>
-#include "../include/data_loader.hpp" // Successfully fixed path!
-#include <vector>          
-#include <string>          
-#include <fstream>       // For opening and reading files from disk
-#include <sstream>       // For splitting text by commas
+#include "../include/data_loader.hpp"
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+
+using namespace std;
 
 namespace projectname {
 
-// This function creates a text grid, reads a CSV file, and fills the grid
-std::vector<std::vector<std::string>> load_csv_data(const std::string& filename) {
-    
-    std::vector<std::vector<std::string>> data_grid;
-    std::ifstream file(filename);
+// Base class constructor definition
+DataLoader::DataLoader(const string& file) : filename(file) {}
 
-    // Safety check: Give clear feedback if the file is missing or path is wrong
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open the file '" << filename << "'. Check the path!" << std::endl;
-        return data_grid; 
+// Safe data access getter
+const vector<vector<string>>& DataLoader::getData() const {
+    return table;
+}
+
+// Derived class polymorphic implementation for parsing CSV data
+void CsvDataLoader::load() {
+    table.clear(); // Clear any existing data
+    ifstream inputFile(filename);
+
+    if (!inputFile.is_open()) {
+        throw runtime_error("Could not open CSV file: " + filename);
     }
 
-    std::string row;     
-    std::string column;  
+    string line;
+    while (getline(inputFile, line)) {
+        vector<string> row;
+        string cell;
+        stringstream lineStream(line);
 
-    // Read the file line by line (row by row)
-    while (std::getline(file, row)) {
-        
-        std::vector<std::string> current_row_data; 
-        std::stringstream row_stream(row);        
-
-        // Extract each column piece separated by a comma
-        while (std::getline(row_stream, column, ',')) {
-            current_row_data.push_back(column);   
+        while (getline(lineStream, cell, ',')) {
+            row.push_back(cell);
         }
 
-        data_grid.push_back(current_row_data);
-    }
+        if (!line.empty() && line.back() == ',') {
+            row.push_back("");
+        }
 
-    file.close();
-    return data_grid;
+        table.push_back(row);
+    }
 }
 
 } // namespace projectname

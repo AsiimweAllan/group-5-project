@@ -11,3 +11,20 @@ The component is split into two clean architecture files inside the repository:
  3. Current Status
 File Detection Bug Fixed: The local header inclusion path was updated to `#include "../include/data_loader.hpp"` to correctly link files across the `src/` and `include/` folders.
 Compilation Success: The standalone component compiles successfully without any syntax or path errors.
+
+week 3
+
+• Encapsulation: The raw file data (table) and the path (filename) are hidden from direct external modification inside the DataLoader class using protected access specifiers. The data can only be read externally using the public method getData().
+• Inheritance: CsvDataLoader inherits all properties and access rules from DataLoader via public inheritance (class CsvDataLoader : public DataLoader).
+• Polymorphism: The load() function is declared as a pure virtual function (= 0) in the base class. It is polymorphically overridden (override) in CsvDataLoader to handle specific CSV syntax. This allows you to handle multiple parser types (like JSON or XML) using a single base pointer
+
+
+
+
+
+
+
+
+
+
+

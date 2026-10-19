@@ -1,14 +1,30 @@
 #ifndef DATA_LOADER_HPP
 #define DATA_LOADER_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace projectname {
 
-    // This tells the rest of the team's files that your loading function exists
-    std::vector<std::vector<std::string>> load_csv_data(const std::string& filename);
+class DataLoader {
+protected: // <-- CRITICAL: Must be protected, NOT private
+    std::string filename; 
+    std::vector<std::vector<std::string>> table; 
+
+public:
+    explicit DataLoader(const std::string& file);
+    virtual ~DataLoader() = default;
+
+    virtual void load() = 0; 
+    const std::vector<std::vector<std::string>>& getData() const;
+};
+
+class CsvDataLoader : public DataLoader {
+public:
+    using DataLoader::DataLoader;
+    void load() override; // Overrides the load function
+};
 
 } // namespace projectname
 
-#endif // DATA_LOADER_HPP
+#endif
