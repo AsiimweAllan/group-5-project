@@ -1,23 +1,43 @@
-#include<iostream>
-#include <vector>          // Needed to make our grid list
-#include <string>          // Needed for text structures
+#include <iostream>
+#include "../include/data_loader.hpp" // Successfully fixed path!
+#include <vector>          
+#include <string>          
+#include <fstream>       // For opening and reading files from disk
+#include <sstream>       // For splitting text by commas
 
 namespace projectname {
 
-// 2. This function creates a simple text grid to store our data rows and columns
+// This function creates a text grid, reads a CSV file, and fills the grid
 std::vector<std::vector<std::string>> load_csv_data(const std::string& filename) {
     
-    // Create a grid (a list that will hold all our rows together)
     std::vector<std::vector<std::string>> data_grid;
+    std::ifstream file(filename);
 
-    // Create simple text variables to hold data while we process it
-    std::string row;     // Will hold one whole horizontal row of text from the file
-    std::string column;  // Will hold one single column piece (word or number) at a time
+    // Safety check: Give clear feedback if the file is missing or path is wrong
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open the file '" << filename << "'. Check the path!" << std::endl;
+        return data_grid; 
+    }
 
-    // [Note for Next Time]: We will add the logic to fill the grid here.
+    std::string row;     
+    std::string column;  
 
-    // 3. Return the spreadsheet grid back to the team
+    // Read the file line by line (row by row)
+    while (std::getline(file, row)) {
+        
+        std::vector<std::string> current_row_data; 
+        std::stringstream row_stream(row);        
+
+        // Extract each column piece separated by a comma
+        while (std::getline(row_stream, column, ',')) {
+            current_row_data.push_back(column);   
+        }
+
+        data_grid.push_back(current_row_data);
+    }
+
+    file.close();
     return data_grid;
 }
 
-} // namespace projectname=`
+} // namespace projectname
