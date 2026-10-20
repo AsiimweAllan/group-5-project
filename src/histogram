@@ -1,27 +1,86 @@
+
 #include <iostream>
 using namespace std;
 
-int main()
+// Base class
+class HistogramBase
 {
-    int data[8] = {2, 3, 3, 4, 4, 4, 5, 5};
-    int frequency[6] = {0};
+protected:
+    int data[8];
+    int size;
 
-    for (int i = 0; i < 8; i++)
+public:
+    HistogramBase()
     {
-        frequency[data[i]]++;
+        int values[8] = {2, 3, 3, 4, 4, 4, 5, 5};
+
+        size = 8;
+
+        for (int i = 0; i < size; i++)
+        {
+            data[i] = values[i];
+        }
     }
 
-    for (int i = 1; i <= 5; i++)
-    {
-        cout << i << ": ";
+    // Virtual function for polymorphism
+    virtual void display() const = 0;
 
-        for (int j = 0; j < frequency[i]; j++)
+    virtual ~HistogramBase() {}
+};
+
+// Derived class
+class TextHistogram : public HistogramBase
+{
+private:
+    int frequency[6];
+
+    void countFrequencies()
+    {
+        for (int i = 0; i < 6; i++)
         {
-            cout << "*";
+            frequency[i] = 0;
         }
 
-        cout << endl;
+        for (int i = 0; i < size; i++)
+        {
+            frequency[data[i]]++;
+        }
     }
+
+public:
+    TextHistogram()
+    {
+        countFrequencies();
+    }
+
+    void display() const override
+    {
+        cout << "HISTOGRAM" << endl;
+        cout << "---------" << endl;
+
+        for (int i = 1; i <= 5; i++)
+        {
+            cout << i << ": ";
+
+            for (int j = 0; j < frequency[i]; j++)
+            {
+                cout << "*";
+            }
+
+            cout << endl;
+        }
+    }
+};
+
+int main()
+{
+    TextHistogram histogram;
+
+    // Base-class pointer referring to a derived-class object
+    HistogramBase* ptr = &histogram;
+
+    // Calls the overridden function
+    ptr->display();
 
     return 0;
 }
