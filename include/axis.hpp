@@ -1,3 +1,4 @@
+
 #ifndef DATAVIZ_AXIS_HPP
 #define DATAVIZ_AXIS_HPP
 
@@ -14,6 +15,7 @@ private:
 
 public:
     AxisData();
+    virtual ~AxisData() = default; // NEW
 
     void setRange(double min, double max);
     void setAxisLabel(const std::string& label);
@@ -26,6 +28,18 @@ public:
 
     const std::vector<double>& getTicks() const;
     const std::vector<std::string>& getLabels() const;
+
+    virtual void printDetails() const; // NEW: polymorphism
+};
+
+// NEW: inheritance
+class LabeledAxis : public AxisData {
+private:
+    std::string unit;
+
+public:
+    LabeledAxis(const std::string& axisUnit);
+    void printDetails() const override;
 };
 
 //prints the axis details to the terminal
