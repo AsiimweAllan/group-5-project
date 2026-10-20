@@ -1,24 +1,31 @@
+
 #include "axis.hpp"
 #include <iostream>
 
+using namespace std;
+
 int main() {
-    AxisData Axis;
+    // Original axis
+    AxisData axis;
+    axis.setAxisLabel("Score");
+    axis.setRange(0, 100);
+    axis.setTicks({0, 20, 40, 60, 80, 100});
+    axis.setLabels({"0", "20", "40", "60", "80", "100"});
 
-    Axis.setRange(0, 100);
-    Axis.setAxisLabel("Score");
+    printAxis(axis);
+    cout << "A score of 50 scales to "
+         << scaleValue(axis, 50) << endl;
 
-    Axis.setTicks({0, 20, 40, 60, 80, 100});
-    Axis.setLabels({"0", "20", "40", "60", "80", "100"});
+    cout << endl;
 
-    printAxis(Axis);
+    // New inherited axis
+    LabeledAxis temperatureAxis("Degrees Celsius");
+    temperatureAxis.setAxisLabel("Temperature");
+    temperatureAxis.setRange(0, 100);
+    temperatureAxis.setLabels({"0", "20", "40", "60", "80", "100"});
 
-    double value = 50;
-
-    std::cout << "Value: " << value << std::endl;
-
-    std::cout << "Scaled position: "
-              << scaleValue(Axis, value)
-              << std::endl;
+    // Demonstrates polymorphism
+    printAxis(temperatureAxis);
 
     return 0;
 }
