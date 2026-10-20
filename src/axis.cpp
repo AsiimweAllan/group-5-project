@@ -1,5 +1,8 @@
+
 #include "axis.hpp"
 #include <iostream>
+
+using namespace std;
 
 AxisData::AxisData()
     : minValue(0), maxValue(100), axisLabel("") {
@@ -12,18 +15,18 @@ void AxisData::setRange(double min, double max) {
     }
 }
 
-void AxisData::setAxisLabel(const std::string& label) {
+void AxisData::setAxisLabel(const string& label) {
     axisLabel = label;
 }
 
-void AxisData::setTicks(const std::vector<double>& values) {
+void AxisData::setTicks(const vector<double>& values) {
     ticks = values;
 }
 
-void AxisData::setLabels(
-    const std::vector<std::string>& values) {
+void AxisData::setLabels(const vector<string>& values) {
     labels = values;
 }
+
 
 double AxisData::getMinValue() const {
     return minValue;
@@ -33,34 +36,54 @@ double AxisData::getMaxValue() const {
     return maxValue;
 }
 
-std::string AxisData::getAxisLabel() const {
+string AxisData::getAxisLabel() const {
     return axisLabel;
 }
 
-const std::vector<double>& AxisData::getTicks() const {
+const vector<double>& AxisData::getTicks() const {
     return ticks;
 }
 
-const std::vector<std::string>& AxisData::getLabels() const {
+const vector<string>& AxisData::getLabels() const {
     return labels;
 }
 
-void printAxis(const AxisData& axis) {
-    std::cout << "Axis Name: "
-              << axis.getAxisLabel() << std::endl;
 
-    std::cout << "Range: "
-              << axis.getMinValue() << " to "
-              << axis.getMaxValue() << std::endl;
+void AxisData::printDetails() const {
+    cout << "Axis Name: " << getAxisLabel() << endl;
 
-    std::cout << "Labels: ";
+    cout << "Range: "
+         << getMinValue() << " to "
+         << getMaxValue() << endl;
 
-    for (const std::string& label : axis.getLabels()) {
-        std::cout << label << " ";
+    cout << "Labels: ";
+
+    for (const string& label : getLabels()) {
+        cout << label << " ";
     }
 
-    std::cout << std::endl;
+    cout << endl;
 }
+
+
+LabeledAxis::LabeledAxis(const string& axisUnit)
+    : unit(axisUnit) {
+}
+
+
+void LabeledAxis::printDetails() const {
+    // Print the normal axis information first
+    AxisData::printDetails();
+
+
+    cout << "Unit: " << unit << endl;
+}
+
+
+void printAxis(const AxisData& axis) {
+    axis.printDetails();
+}
+
 
 double scaleValue(const AxisData& axis, double value) {
     if (axis.getMaxValue() == axis.getMinValue()) {
