@@ -1,7 +1,8 @@
-#ifndef KDE_H
-#define KDE_H
+#ifndef KDE_HPP
+#define KDE_HPP
 
 #include <vector>
+#include<utility>
 // KDE = Kernel Density Estimation
 // This class shows where our data is concentrated mostly in a given set of numerical values.
 
@@ -16,6 +17,11 @@ public:
     double evaluate(double x) const;
     // calculates the KDE density at a specific point x value.
     // eg : kde.evaluate(50)
+    std::vector<std::pair<double, double>> evaluateRange(
+    double start,
+    double end,
+    double step
+) const;
 
 };
 #endif
