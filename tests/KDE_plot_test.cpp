@@ -46,6 +46,44 @@ int main() {
     assert(kde.evaluate(0.0) > kde.evaluate(20.0));
     assert(kde.evaluate(10.0) > kde.evaluate(-10.0));
     assert(isfinite(kde.evaluate(5.0)));
+     
+    
+    // Test that evaluateRange returns the expected number of points.
+    const KDE range_kde({2.0, 3.0, 4.0}, 1.0);
+    const auto points = range_kde.evaluateRange(0.0, 6.0, 1.0);
+
+    assert(points.size() == 7);
+    assert(fabs(points[0].first - 0.0) < 1e-12);
+    assert(fabs(points[0].second - range_kde.evaluate(0.0)) < 1e-12);
+    assert(fabs(points[6].first - 6.0) < 1e-12);
+
+    // Test that evaluateRange rejects a zero step.
+    threw = false;
+    try {
+        range_kde.evaluateRange(0.0, 6.0, 0.0);
+    } catch (const invalid_argument&) {
+        threw = true;
+    }
+    assert(threw);
+
+    // Test that evaluateRange rejects an end value below the start.
+    threw = false;
+    try {
+        range_kde.evaluateRange(6.0, 0.0, 1.0);
+    } catch (const invalid_argument&) {
+        threw = true;
+    }
+    assert(threw);
+
+    // Test that the constructor rejects negative bandwidth.
+    threw = false;
+    try {
+        KDE negative_bandwidth({0.0, 1.0}, -1.0);
+    } catch (const invalid_argument&) {
+        threw = true;
+    }
+    assert(threw);
+
 
     return 0;
 }
