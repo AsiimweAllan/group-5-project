@@ -1,34 +1,33 @@
-#include "countplot.hpp"
-
-using namespace std;
-
+#ifndef DATAVIZ_COUNTPLOT_HPP
+#define DATAVIZ_COUNTPLOT_HPP
+#include <cstddef>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+#include "plot.hpp"
 namespace dataviz {
+// CountPlot is another kind of Plot and provides its own summary.
+class CountPlot : public Plot {
+    std::vector<std::string> categories_;
+public:
+    explicit CountPlot(std::vector<std::string> categories);
 
-CountPlot::CountPlot(vector<string> categories)
-    : Plot("Count plot") {
-    categories_ = categories;
+    // Original functions (unchanged, other modules may use them).
+    std::map<std::string, std::size_t> counts() const;
+    std::string summary() const override;
+
+    // New in week 3.
+    // Total number of items in the data.
+    std::size_t total() const;
+    // Category with the highest count (alphabetical first if tied, "" if no data).
+    std::string mostCommon() const;
+    // Share of each category as a percentage (0 to 100).
+    std::map<std::string, double> percentages() const;
+    // Categories ordered from highest to lowest count.
+    std::vector<std::pair<std::string, std::size_t>> sortedCounts() const;
+    // Simple text bar chart, one line per category.
+    std::string textChart(std::size_t maxWidth = 30) const;
+};
 }
-
-map<string, size_t> CountPlot::counts() const {
-    map<string, size_t> categoryCounts;
-
-    // Go through the list and add one to each category's count.
-    for (const string& category : categories_) {
-        categoryCounts[category]++;
-    }
-
-    return categoryCounts;
-}
-
-string CountPlot::summary() const {
-    map<string, size_t> categoryCounts = counts();
-    string message = title_ + " counts:";
-
-    for (const auto& item : categoryCounts) {
-        message = message + " " + item.first + " = " + to_string(item.second) + ";";
-    }
-
-    return message;
-}
-
-}
+#endif
