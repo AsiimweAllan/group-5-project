@@ -1,3 +1,4 @@
+
 #ifndef DATAVIZ_COUNTPLOT_HPP
 #define DATAVIZ_COUNTPLOT_HPP
 
@@ -5,13 +6,12 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace dataviz {
 
 struct Color {
-    std::uint8_t r{70}, g{130}, b{180};
+    std::uint8_t r, g, b;
 };
 
 class Plot {
@@ -23,9 +23,9 @@ protected:
 public:
     virtual ~Plot() = default;
 
-    void setXLabel(const std::string& label) { x_label_ = label; }
-    void setYLabel(const std::string& label) { y_label_ = label; }
-    void setTitle(const std::string& title) { title_ = title; }
+    void setXLabel(const std::string& label);
+    void setYLabel(const std::string& label);
+    void setTitle(const std::string& title);
 
     virtual std::string summary() const = 0;
 
@@ -41,10 +41,14 @@ private:
     Color bar_color_{70, 130, 180};
 
 public:
-    explicit CountPlot(std::vector<std::string> categories)
-        : categories_(std::move(categories)) {}
+    explicit CountPlot(
+        const std::vector<std::string>& categories
+    );
 
     std::map<std::string, std::size_t> counts() const;
+
+    std::map<std::string, std::size_t>
+    computeFrequencies() const;
 
     std::string summary() const override;
 
@@ -53,9 +57,9 @@ public:
         int height = 500
     ) const override;
 
-    void setBarColor(Color color) { bar_color_ = color; }
+    void setBarColor(Color color);
 };
 
-} // namespace dataviz
+}
 
-#endif // DATAVIZ_COUNTPLOT_HPP
+#endif
