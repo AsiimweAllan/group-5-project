@@ -34,6 +34,7 @@ void CsvDataLoader::load() {
             row.push_back(cell);
         }
 
+        // Handle trailing empty cells (e.g., if a line ends with a comma)
         if (!line.empty() && line.back() == ',') {
             row.push_back("");
         }
