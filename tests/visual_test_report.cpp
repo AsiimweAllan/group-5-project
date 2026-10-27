@@ -28,6 +28,7 @@ bool csvChecks(const std::vector<std::vector<std::string>>& rows) {
 
 void writeSvgReport(const std::vector<std::vector<std::string>>& rows,
                     bool axisPassed, bool csvPassed, double midpoint) {
+    std::filesystem::create_directories("test-results");
     std::ofstream svg("test-results/summary.svg");
     if (!svg) throw std::runtime_error("Cannot create test-results/summary.svg");
     const bool allPassed = axisPassed && csvPassed;
@@ -139,7 +140,9 @@ int main() {
     AxisData axis;
     double midpoint = 0.0;
     const bool axisPassed = axisChecks(axis, midpoint);
-    const auto rows = projectname::load_csv_data("scores.csv");
+    projectname::CsvDataLoader loader("scores.csv");
+    loader.load();
+    const auto rows = loader.getData();
     const bool csvPassed = csvChecks(rows);
     writeSvgReport(rows, axisPassed, csvPassed, midpoint);
     writeReport(rows, axisPassed, csvPassed, midpoint);

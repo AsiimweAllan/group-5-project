@@ -1,14 +1,13 @@
- #include "../include/data_loader.hpp"
+#include "../include/data_loader.hpp"
 
 #include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
-#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 using namespace std;
-using projectname::load_csv_data;
 
 namespace {
 
@@ -20,9 +19,15 @@ string write_temp_file(const string& name, const string& contents) {
     return name;
 }
 
+Grid load_csv_file(const string& name) {
+    projectname::CsvDataLoader loader(name);
+    loader.load();
+    return loader.getData();
+}
+
 Grid load_from_text(const string& name, const string& contents) {
     write_temp_file(name, contents);
-    Grid result = load_csv_data(name);
+    Grid result = load_csv_file(name);
     remove(name.c_str());
     return result;
 }
@@ -30,7 +35,7 @@ Grid load_from_text(const string& name, const string& contents) {
 }  // namespace
 
 int main() {
-    const Grid fixture = load_csv_data("scores.csv");
+    const Grid fixture = load_csv_file("scores.csv");
     assert(fixture.size() == 5);
     assert(fixture[0] == (vector<string>{"name", "score", "group"}));
     assert(fixture[1] == (vector<string>{"Ada", "91", "A"}));
@@ -42,13 +47,14 @@ int main() {
     cout << "Data loader fixture test passed.\n";
 
     {
-        ostringstream captured;
-        streambuf* old_buf = cerr.rdbuf(captured.rdbuf());
-        const Grid missing = load_csv_data("this_file_does_not_exist.csv");
-        cerr.rdbuf(old_buf);
-
-        assert(missing.empty());
-        assert(captured.str().find("Could not open") != string::npos);
+        bool threw_file_error = false;
+        try {
+            (void)load_csv_file("this_file_does_not_exist.csv");
+        } catch (const runtime_error& error) {
+            threw_file_error = true;
+            assert(string(error.what()).find("Could not open CSV file") != string::npos);
+        }
+        assert(threw_file_error);
     }
 
     const Grid empty_file = load_from_text("tmp_empty.csv", "");
@@ -86,10 +92,10 @@ int main() {
     const Grid spaces = load_from_text("tmp_spaces.csv", " a , b \n");
     assert(spaces[0] == (vector<string>{" a ", " b "}));
 
-    // Current behavior: trailing comma adds no empty field.
+    // A trailing comma represents a final empty field.
     const Grid trailing_comma = load_from_text("tmp_trailing_comma.csv", "a,b,\n");
     assert(trailing_comma.size() == 1);
-    assert(trailing_comma[0] == (vector<string>{"a", "b"}));
+    assert(trailing_comma[0] == (vector<string>{"a", "b", ""}));
 
     // Current limitation: quoted fields are not supported.
     const Grid quoted = load_from_text("tmp_quoted.csv", "\"a,b\",c\n");

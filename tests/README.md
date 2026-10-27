@@ -36,10 +36,10 @@ What each test checks:
 | --- | --- | --- |
 | `kde_unit_test` | `KDE` class | Rejects empty data and invalid bandwidth; checks Gaussian density values. |
 | `axis_unit_test` | `AxisData` class and `scaleValue` | Checks defaults, range and label setters/getters, tick labels, invalid ranges, and scaled positions. |
-| `data_loader_unit_test` | `projectname::load_csv_data` | Checks the CSV fixture plus empty/missing files, row shapes, blank fields, and line endings. |
-| `visual_test_report` | `AxisData` and `projectname::load_csv_data` | Rechecks the axis midpoint and fixture records, then writes the graphical report files. |
+| `data_loader_unit_test` | `projectname::CsvDataLoader` | Checks the CSV fixture plus empty/missing files, row shapes, blank fields, and line endings. |
+| `visual_test_report` | `AxisData` and `projectname::CsvDataLoader` | Rechecks the axis midpoint and fixture records, then writes the graphical report files. |
 
-The test programs instantiate the available classes (`KDE` and `AxisData`) and check their public behavior. The DataLoader is currently a namespace function, so it is tested by calling the function and checking the returned rows.
+The test programs instantiate the available classes (`KDE`, `AxisData`, and `CsvDataLoader`) and check their public behavior. The loader's `load()` method fills its stored rows, which the tests read through `getData()`.
 
 ## View graphical results
 
@@ -75,6 +75,4 @@ It prints an asterisk histogram in the terminal; it does not create a graphical 
 
 ## Classes and polymorphism
 
-The current branch has class-based tests for `KDE` and `AxisData`, but it does not define a shared polymorphic plot base class. `DataLoader` is a free function. The unfinished `CountPlot` class is local to its `.cpp` file, and there is no buildable `Histogram` class on this branch. Therefore the current tests cannot run a meaningful base-class/derived-class dispatch test.
-
-When the plot classes are completed, a polymorphism test should create different plot objects through a common base-class interface and call the same virtual render or summary method on each. That verifies dynamic dispatch and each plot's output. Keep each plot's numeric/counting behavior covered by focused unit tests as well.
+The current branch has class-based tests for `KDE`, `AxisData`, and `CsvDataLoader`, but it does not define a shared polymorphic plot base class. The unfinished `CountPlot` class is local to its `.cpp` file, and there is no buildable `Histogram` class on this branch. Therefore the current tests cannot run a meaningful base-class/derived-class dispatch test.
