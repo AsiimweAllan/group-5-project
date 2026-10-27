@@ -1,81 +1,96 @@
-# Group 5 C++ Data Visualization Library
+# Group 5 C++ Data Visualization Project
 
-A small C++17 learning project for reading simple CSV data and calculating basic summaries. The project is organized as a reusable library with separate example programs. The examples print results in the terminal; the project does not currently draw charts in a graphical window.
+A C++17 learning project for reading simple CSV data and exploring reusable components for data analysis and visualization. The repository contains CSV loading, axis scaling, kernel density estimation (KDE), a standalone text histogram, examples, and CMake-based tests.
 
-## Features
+## Project goals
 
-- Read CSV rows into a two-dimensional collection of strings.
-- Trim whitespace around cells and remove rows that are entirely blank.
-- Store axis labels and ranges, and scale values to positions between 0 and 1.
-- Estimate numeric data density using a Gaussian kernel density estimate (KDE).
-- Group numeric data into histogram bins and count the values in each bin.
-- Count how often each text category appears.
-- Demonstrate class inheritance and polymorphism with a shared `Plot` base class and the `Histogram` and `CountPlot` classes.
+- Organize C++ code into reusable components with clear interfaces.
+- Read and inspect simple CSV data.
+- Practice classes, encapsulation, inheritance, and polymorphism.
+- Check component behavior with small, repeatable tests.
 
-## Project structure
+## Current features
 
-| Folder | Contents |
+- `CsvDataLoader` reads comma-separated text into rows of strings.
+- `AxisData` stores an axis range, label, ticks, and tick labels; `scaleValue` maps a value into a normalized position.
+- `KDE` calculates Gaussian kernel density estimates for numeric input.
+- `src/histogram` is a standalone program that prints a text histogram.
+- CMake builds four registered test programs for the CSV loader, axis scaling, KDE, and a combined visual test report.
+
+The current CMake configuration builds the test programs. The repository does not yet build all components as one integrated, installed visualization library. The text histogram is also separate from the CMake test targets. See [tests/README.md](tests/README.md) for the exact test coverage and histogram instructions.
+
+## Project layout
+
+| Path | Contents |
 | --- | --- |
-| `include/` | Public class and function declarations (`.hpp` files) |
-| `src/` | Implementations of the library components (`.cpp` files) |
-| `examples/` | Small programs that demonstrate one component at a time |
-| `data/` | Sample CSV input |
-| `tests/` | Test source files from project development |
-| `reports/` | Weekly group and individual report drafts |
+| `include/` | Public headers for the components |
+| `src/` | Component implementations and standalone histogram source |
+| `examples/` | Small programs demonstrating project components |
+| `tests/` | CMake test targets, test sources, and a CSV fixture |
+| `data/` | Data files and output folder used by project work |
+| `reports/` | Group and individual reports, figures, and project documentation |
+| `cmake/` | CMake package configuration template |
 
 ## Requirements
 
 - CMake 3.16 or newer
 - A C++17 compiler
-- A build tool supported by the CMake generator
+- A CMake-supported build tool
 
-For the current Windows setup, the commands below use the MSYS2 UCRT64 `g++` compiler and `mingw32-make`.
+The commands below use MSYS2 UCRT64 MinGW on Windows. Change the compiler and make paths if MSYS2 is installed elsewhere.
 
-## Build on Windows with MinGW
+## Build and run the tests
 
-Open this project folder in VS Code, open **Terminal → New Terminal**, and run these commands from the project root:
-
-```powershell
-cmake -G "MinGW Makefiles" -S . -B build-mingw -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe
-cmake --build build-mingw
-```
-
-CMake creates the `dataviz` library and builds the example programs in `build-mingw/`.
-
-## Run the examples
-
-Run these commands from the project root after building:
+Open PowerShell in the project root and run:
 
 ```powershell
-.\build-mingw\data_loader_example.exe .\data\sample.csv
-.\build-mingw\axis_example.exe
-.\build-mingw\kde_example.exe
-.\build-mingw\histogram_example.exe
-.\build-mingw\countplot_example.exe
-.\build-mingw\polymorphism_example.exe
+cmake -S . -B build-testing -G "MinGW Makefiles" `
+  -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe `
+  -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe
+cmake --build build-testing --parallel 4
+ctest --test-dir build-testing --output-on-failure
 ```
 
-The data loader example accepts a CSV path as an argument. The other examples use small values written directly in their source files.
+Run CTest only after the build completes successfully. To run one test, add its name filter; for example:
 
-## Classes and how they are organized
+```powershell
+ctest --test-dir build-testing --output-on-failure -R "^kde_unit_test$"
+```
 
-Each class keeps related data and functions together. For example, `Histogram` stores numeric values and a bin count, then provides functions to find the minimum, maximum, and counts in each bin. Its stored values are private; other code uses its public functions to get results.
+The registered tests are:
 
-`Plot` is a parent class with a shared title and a virtual `summary()` function. `Histogram` and `CountPlot` inherit from `Plot` and provide their own version of `summary()`. The `polymorphism_example.cpp` program passes both kinds of object to the same `showSummary()` function. The function calls the correct summary implementation for the object it receives.
+| Test | Main behavior checked |
+| --- | --- |
+| `kde_unit_test` | KDE density values and invalid inputs |
+| `axis_unit_test` | Axis defaults, range and label accessors, and value scaling |
+| `data_loader_unit_test` | CSV fixture, row parsing, blank fields, and missing-file behavior |
+| `visual_test_report` | Axis midpoint and CSV fixture checks; creates an HTML and SVG summary |
+
+After the visual test runs, open the report with:
+
+```powershell
+Start-Process -FilePath '.\build-testing\test-results\index.html'
+```
 
 ## Current limitations
 
-- The CSV loader splits rows at commas. It is intended for simple CSV files and does not handle quoted commas or multiline quoted fields.
-- The cleaner trims cell boundaries and removes fully blank rows. It does not decide how missing values should be replaced.
-- KDE bandwidth affects how smooth the estimate looks; the current program expects the user to choose a positive bandwidth.
-- The `tests/` source files are not yet registered as CMake tests. A successful build confirms the library and examples compile, but does not mean the tests have run.
+- The CSV loader splits fields at commas and does not support quoted commas or multiline quoted fields.
+- The histogram is a standalone text program rather than an integrated library component.
+- KDE results are numeric; the KDE test does not draw a density curve.
+- CountPlot and other planned chart components are not currently part of the registered CMake test suite.
+
+## AI use
+
+AI tools were used as development support to explain CMake and the project’s test structure, help diagnose the mismatch between the CSV loader tests and the `CsvDataLoader` class interface, and revise project documentation. The updated tests were rebuilt and run with CTest. Group members are responsible for reviewing, understanding, and approving AI-assisted changes before submitting the project.
 
 ## References
 
-These sources explain the standard-library tools and data visualization concepts that can be used to study this project. Seaborn, NumPy, and Matplotlib are Python libraries; they are references for the ideas only and are not dependencies of this C++ project.
+- cppreference.com, [C++ Standard Library](https://en.cppreference.com/w/cpp/standard_library) — standard headers and library components.
+- cppreference.com, [Input/output library](https://en.cppreference.com/w/cpp/io/) — file and string streams.
+- seaborn, [KDE plot documentation](https://seaborn.pydata.org/generated/seaborn.kdeplot.html) — kernel density estimate concepts.
+- NumPy, [Histogram documentation](https://numpy.org/doc/stable/reference/generated/numpy.histogram.html) — binning and counting values.
+- Matplotlib, [Histogram function documentation](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html) — histogram concepts.
 
-- cppreference.com, [C++ Standard Library](https://en.cppreference.com/w/cpp/standard_library) — standard headers and library components such as vectors, maps, streams, and exceptions.
-- cppreference.com, [Input/output library](https://en.cppreference.com/w/cpp/io/) — file and string streams used when reading text data.
-- seaborn, [KDE plot documentation](https://seaborn.pydata.org/generated/seaborn.kdeplot.html) — kernel density estimates and bandwidth.
-- NumPy, [Histogram documentation](https://numpy.org/doc/stable/reference/generated/numpy.histogram.html) — dividing values into bins and counting observations.
-- Matplotlib, [Histogram function documentation](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html) — histogram examples and bin behavior.
+## License
+
+This project is distributed under the MIT License. See [LICENSE](LICENSE).
