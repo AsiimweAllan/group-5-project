@@ -1,20 +1,25 @@
 
+#include "countplot.hpp"
+#include "axis.hpp"
+
 #include <algorithm>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
-#include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <map>
-#include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-struct Color {
-    std::uint8_t r, g, b;
-};
+namespace dataviz {
+
+namespace {
 
 std::string escapeXML(const std::string& text) {
     std::string result;
+
     for (char ch : text) {
         switch (ch) {
             case '&': result += "&amp;"; break;
@@ -22,301 +27,274 @@ std::string escapeXML(const std::string& text) {
             case '>': result += "&gt;"; break;
             case '"': result += "&quot;"; break;
             case '\'': result += "&apos;"; break;
-            default: result += ch;
+            default: result += ch; break;
         }
     }
+
     return result;
 }
 
-class Plot {
-protected:
-    std::string x_label_;
-    std::string y_label_;
-    std::string title_;
+std::string formatNumber(
+    double value,
+    int precision = 0
+) {
+    std::ostringstream out;
 
-public:
-    virtual ~Plot() = default;
+    out << std::fixed
+        << std::setprecision(precision)
+        << value;
 
-    void setXLabel(const std::string& label) {
-        x_label_ = label;
+    return out.str();
+}
+
+}
+
+void Plot::setXLabel(const std::string& label) {
+    x_label_ = label;
+}
+
+void Plot::setYLabel(const std::string& label) {
+    y_label_ = label;
+}
+
+void Plot::setTitle(const std::string& title) {
+    title_ = title;
+}
+
+CountPlot::CountPlot(
+    const std::vector<std::string>& categories
+) : categories_(categories) {
+}
+
+void CountPlot::setBarColor(Color color) {
+    bar_color_ = color;
+}
+
+std::map<std::string, std::size_t>
+CountPlot::counts() const {
+    std::map<std::string, std::size_t> categoryCounts;
+
+    for (const auto& category : categories_) {
+        ++categoryCounts[category];
     }
 
-    void setYLabel(const std::string& label) {
-        y_label_ = label;
+    return categoryCounts;
+}
+
+std::map<std::string, std::size_t>
+CountPlot::computeFrequencies() const {
+    return counts();
+}
+
+std::string CountPlot::summary() const {
+    const auto categoryCounts = counts();
+
+    std::string message = title_ + " counts:";
+
+    if (categoryCounts.empty()) {
+        return message + " No categories available.";
     }
 
-    void setTitle(const std::string& title) {
-        title_ = title;
+    for (const auto& item : categoryCounts) {
+        message += " " + item.first + " = "
+                + std::to_string(item.second) + ";";
     }
 
-    virtual std::string renderSVG(
-        int width = 600,
-        int height = 400
-    ) const = 0;
-};
+    return message;
+}
 
-class CountPlot : public Plot {
-private:
-    std::vector<std::string> data_;
-    Color bar_color_ = {70, 130, 180};
-
-public:
-    explicit CountPlot(const std::vector<std::string>& data)
-        : data_(data) {
-        y_label_ = "Count";
-    }
-
-    std::map<std::string, std::size_t> computeFrequencies() const {
-        std::map<std::string, std::size_t> counts;
-
-        for (const auto& item : data_) {
-            ++counts[item];
-        }
-
-        return counts;
-    }
-
-    std::string renderSVG(
-        int width = 600,
-        int height = 400
-    ) const override {
-        const auto counts = computeFrequencies();
-
-        if (counts.empty()) return "";
-
-        if (width < 200 || height < 200)
-            throw std::invalid_argument(
-                "SVG dimensions must be at least 200"
-            );
-
-        const int margin = 65;
-        const int chartWidth = width - 2 * margin;
-        const int chartHeight = height - 2 * margin;
-        const int slotWidth =
-            chartWidth / static_cast<int>(counts.size());
-
-        if (slotWidth < 1)
-            throw std::invalid_argument(
-                "Too many categories for the SVG width"
-            );
-
-        const int barWidth = std::max(1, slotWidth * 3 / 5);
-
-        std::size_t maxCount = 0;
-
-        for (const auto& entry : counts) {
-            maxCount = std::max(maxCount, entry.second);
-        }
-
-        std::string svg =
-            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" +
-            std::to_string(width) + "\" height=\"" +
-            std::to_string(height) + "\">\n";
-
-        svg += "<text x=\"" + std::to_string(width / 2) +
-               "\" y=\"24\" text-anchor=\"middle\">" +
-               escapeXML(title_) + "</text>\n";
-
-        svg += "<text x=\"" + std::to_string(width / 2) +
-               "\" y=\"" + std::to_string(height - 8) +
-               "\" text-anchor=\"middle\">" +
-               escapeXML(x_label_) + "</text>\n";
-
-        svg += "<text x=\"8\" y=\"" +
-               std::to_string(margin - 10) + "\">" +
-               escapeXML(y_label_) + "</text>\n";
-
-        int i = 0;
-
-        for (const auto& [category, count] : counts) {
-            const int x =
-                margin + i * slotWidth +
-                (slotWidth - barWidth) / 2;
-
-            const int barHeight =
-                static_cast<int>(
-                    static_cast<double>(count) /
-                    maxCount * chartHeight
-                );
-
-            const int y = margin + chartHeight - barHeight;
-
-            svg += "<rect x=\"" + std::to_string(x) +
-                   "\" y=\"" + std::to_string(y) +
-                   "\" width=\"" + std::to_string(barWidth) +
-                   "\" height=\"" + std::to_string(barHeight) +
-                   "\" fill=\"rgb(" +
-                   std::to_string(bar_color_.r) + "," +
-                   std::to_string(bar_color_.g) + "," +
-                   std::to_string(bar_color_.b) +
-                   ")\"/>\n";
-
-            svg += "<text x=\"" +
-                   std::to_string(x + barWidth / 2) +
-                   "\" y=\"" +
-                   std::to_string(height - margin + 18) +
-                   "\" font-size=\"12\" text-anchor=\"middle\">" +
-                   escapeXML(category) + "</text>\n";
-
-            ++i;
-        }
-
-        return svg + "</svg>\n";
-    }
-};
-
-class PercentagePlot : public Plot {
-private:
-    std::vector<std::string> data_;
-    Color bar_color_ = {46, 139, 87};
-
-public:
-    explicit PercentagePlot(
-        const std::vector<std::string>& data
-    ) : data_(data) {
-        y_label_ = "Percentage (%)";
-    }
-
-    std::map<std::string, double> computePercentages() const {
-        std::map<std::string, double> percentages;
-
-        if (data_.empty()) return percentages;
-
-        for (const auto& item : data_) {
-            ++percentages[item];
-        }
-
-        for (auto& entry : percentages) {
-            entry.second =
-                entry.second * 100.0 / data_.size();
-        }
-
-        return percentages;
-    }
-
-    std::string renderSVG(
-        int width = 600,
-        int height = 400
-    ) const override {
-        const auto percentages = computePercentages();
-
-        if (percentages.empty()) return "";
-
-        if (width < 200 || height < 200)
-            throw std::invalid_argument(
-                "SVG dimensions must be at least 200"
-            );
-
-        const int margin = 65;
-        const int chartWidth = width - 2 * margin;
-        const int chartHeight = height - 2 * margin;
-
-        const int slotWidth =
-            chartWidth / static_cast<int>(percentages.size());
-
-        if (slotWidth < 1)
-            throw std::invalid_argument(
-                "Too many categories for the SVG width"
-            );
-
-        const int barWidth = std::max(1, slotWidth * 3 / 5);
-
-        std::string svg =
-            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" +
-            std::to_string(width) + "\" height=\"" +
-            std::to_string(height) + "\">\n";
-
-        svg += "<text x=\"" + std::to_string(width / 2) +
-               "\" y=\"24\" text-anchor=\"middle\">" +
-               escapeXML(title_) + "</text>\n";
-
-        svg += "<text x=\"" + std::to_string(width / 2) +
-               "\" y=\"" + std::to_string(height - 8) +
-               "\" text-anchor=\"middle\">" +
-               escapeXML(x_label_) + "</text>\n";
-
-        svg += "<text x=\"8\" y=\"" +
-               std::to_string(margin - 10) + "\">" +
-               escapeXML(y_label_) + "</text>\n";
-
-        int i = 0;
-
-        for (const auto& [category, percentage] : percentages) {
-            const int x =
-                margin + i * slotWidth +
-                (slotWidth - barWidth) / 2;
-
-            const int barHeight =
-                static_cast<int>(
-                    percentage / 100.0 * chartHeight
-                );
-
-            const int y = margin + chartHeight - barHeight;
-
-            svg += "<rect x=\"" + std::to_string(x) +
-                   "\" y=\"" + std::to_string(y) +
-                   "\" width=\"" + std::to_string(barWidth) +
-                   "\" height=\"" + std::to_string(barHeight) +
-                   "\" fill=\"rgb(" +
-                   std::to_string(bar_color_.r) + "," +
-                   std::to_string(bar_color_.g) + "," +
-                   std::to_string(bar_color_.b) +
-                   ")\"/>\n";
-
-            svg += "<text x=\"" +
-                   std::to_string(x + barWidth / 2) +
-                   "\" y=\"" +
-                   std::to_string(height - margin + 18) +
-                   "\" font-size=\"12\" text-anchor=\"middle\">" +
-                   escapeXML(category) + "</text>\n";
-
-            ++i;
-        }
-
-        return svg + "</svg>\n";
-    }
-};
-
-int main() {
-    const std::vector<std::string> categories = {
-        "Apple", "Banana", "Apple",
-        "Orange", "Banana", "Apple"
-    };
-
-    std::vector<std::unique_ptr<Plot>> plots;
-
-    plots.push_back(
-        std::make_unique<CountPlot>(categories)
-    );
-
-    plots.push_back(
-        std::make_unique<PercentagePlot>(categories)
-    );
-
-    const std::vector<std::string> filenames = {
-        "count_plot.svg",
-        "percentage_plot.svg"
-    };
-
-    for (std::size_t i = 0; i < plots.size(); ++i) {
-        plots[i]->setXLabel("Fruit category");
-
-        plots[i]->setTitle(
-            i == 0 ? "Fruit counts" : "Fruit percentages"
+std::string CountPlot::renderSVG(
+    int width,
+    int height
+) const {
+    if (width < 400 || height < 300) {
+        throw std::invalid_argument(
+            "SVG dimensions must be at least 400 x 300"
         );
-
-        std::ofstream output(filenames[i]);
-
-        if (!output) {
-            std::cerr << "Could not open "
-                      << filenames[i] << '\n';
-            return 1;
-        }
-
-        output << plots[i]->renderSVG();
-
-        std::cout << "Saved " << filenames[i] << '\n';
     }
 
-    return 0;
+    const auto categoryCounts = computeFrequencies();
+
+    if (categoryCounts.empty()) {
+        throw std::invalid_argument(
+            "Cannot generate a chart from empty data"
+        );
+    }
+
+    if (categoryCounts.size() > 20) {
+        throw std::invalid_argument(
+            "Too many categories. Maximum supported is 20"
+        );
+    }
+
+    const int left = 80;
+    const int right = 35;
+    const int top = 65;
+    const int bottom = 100;
+
+    const int chartWidth = width - left - right;
+    const int chartHeight = height - top - bottom;
+
+    const double slotWidth =
+        static_cast<double>(chartWidth) /
+        categoryCounts.size();
+
+    const double barWidth =
+        std::max(1.0, std::min(55.0, slotWidth * 0.6));
+
+    std::size_t maxCount = 0;
+
+    for (const auto& entry : categoryCounts) {
+        maxCount = std::max(maxCount, entry.second);
+    }
+
+    const double axisMaximum =
+        std::max(5.0, std::ceil(maxCount / 5.0) * 5.0);
+
+    AxisData yAxis;
+
+    yAxis.setRange(0.0, axisMaximum);
+    yAxis.setAxisLabel(y_label_);
+
+    std::vector<double> tickValues;
+    std::vector<std::string> tickLabels;
+
+    for (int tick = 0; tick <= 5; ++tick) {
+        const double value = axisMaximum * tick / 5.0;
+
+        tickValues.push_back(value);
+        tickLabels.push_back(formatNumber(value));
+    }
+
+    yAxis.setTicks(tickValues);
+    yAxis.setLabels(tickLabels);
+
+    std::ostringstream svg;
+
+    svg << "<svg xmlns=\"http://www.w3.org/2000/svg\" "
+        << "width=\"" << width
+        << "\" height=\"" << height
+        << "\" viewBox=\"0 0 "
+        << width << " " << height << "\">\n";
+
+    svg << "<rect width=\"100%\" height=\"100%\" "
+        << "fill=\"white\"/>\n";
+
+    svg << "<g font-family=\"Arial, sans-serif\" "
+        << "fill=\"#253044\">\n";
+
+    svg << "<text x=\"" << width / 2
+        << "\" y=\"30\" text-anchor=\"middle\" "
+        << "font-size=\"20\" font-weight=\"bold\">"
+        << escapeXML(title_)
+        << "</text>\n";
+
+    const auto& ticks = yAxis.getTicks();
+    const auto& labels = yAxis.getLabels();
+
+    for (std::size_t tick = 0; tick < ticks.size(); ++tick) {
+        const double value = ticks[tick];
+
+        const double y =
+            top + chartHeight *
+            (1.0 - scaleValue(yAxis, value));
+
+        svg << "<line x1=\"" << left
+            << "\" y1=\"" << y
+            << "\" x2=\"" << width - right
+            << "\" y2=\"" << y
+            << "\" stroke=\"#e3e8ef\"/>\n";
+
+        svg << "<text x=\"" << left - 10
+            << "\" y=\"" << y + 4
+            << "\" text-anchor=\"end\" "
+            << "font-size=\"11\">"
+            << escapeXML(labels[tick])
+            << "</text>\n";
+    }
+
+    svg << "<line x1=\"" << left
+        << "\" y1=\"" << top
+        << "\" x2=\"" << left
+        << "\" y2=\"" << top + chartHeight
+        << "\" stroke=\"#536071\"/>\n";
+
+    svg << "<line x1=\"" << left
+        << "\" y1=\"" << top + chartHeight
+        << "\" x2=\"" << width - right
+        << "\" y2=\"" << top + chartHeight
+        << "\" stroke=\"#536071\"/>\n";
+
+    std::size_t index = 0;
+
+    for (const auto& entry : categoryCounts) {
+        const std::string& category = entry.first;
+        const std::size_t count = entry.second;
+
+        const double center =
+            left + (index + 0.5) * slotWidth;
+
+        const double barHeight =
+            scaleValue(
+                yAxis,
+                static_cast<double>(count)
+            ) * chartHeight;
+
+        const double x = center - barWidth / 2.0;
+
+        const double y =
+            top + chartHeight - barHeight;
+
+        svg << "<rect x=\"" << x
+            << "\" y=\"" << y
+            << "\" width=\"" << barWidth
+            << "\" height=\"" << barHeight
+            << "\" rx=\"3\" fill=\"rgb("
+            << static_cast<int>(bar_color_.r) << ","
+            << static_cast<int>(bar_color_.g) << ","
+            << static_cast<int>(bar_color_.b)
+            << ")\"/>\n";
+
+        svg << "<text x=\"" << center
+            << "\" y=\"" << std::max(50.0, y - 8.0)
+            << "\" text-anchor=\"middle\" "
+            << "font-size=\"12\" font-weight=\"bold\">"
+            << count
+            << "</text>\n";
+
+        std::string label = category;
+
+        if (label.size() > 14) {
+            label = label.substr(0, 11) + "...";
+        }
+
+        svg << "<text x=\"" << center
+            << "\" y=\"" << top + chartHeight + 20
+            << "\" text-anchor=\"middle\" "
+            << "font-size=\"11\">"
+            << escapeXML(label)
+            << "</text>\n";
+
+        ++index;
+    }
+
+    svg << "<text x=\"" << width / 2
+        << "\" y=\"" << height - 25
+        << "\" text-anchor=\"middle\" "
+        << "font-size=\"14\">"
+        << escapeXML(x_label_)
+        << "</text>\n";
+
+    svg << "<text transform=\"translate(22 "
+        << top + chartHeight / 2
+        << ") rotate(-90)\" "
+        << "text-anchor=\"middle\" font-size=\"14\">"
+        << escapeXML(yAxis.getAxisLabel())
+        << "</text>\n";
+
+    svg << "</g>\n</svg>\n";
+
+    return svg.str();
+}
+
 }
