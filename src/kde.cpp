@@ -10,8 +10,8 @@ KDE::KDE(const std::vector<double>& data, double bandwidth) : data(data), bandwi
         throw std::invalid_argument("KDE data cannot be empty.");
     } // KDE requires at least one data point.
 
-    if(bandwidth <= 0){
-        throw std::invalid_argument("KDE bandwidth must be a positive value.");
+    if (!std::isfinite(bandwidth) || bandwidth <= 0){
+        throw std::invalid_argument("KDE bandwidth must be a finite positive value.");
     } // bandwidth must be > 0.
     
 }
@@ -34,6 +34,13 @@ std::vector<std::pair<double, double>> KDE::evaluateRange(
 {
     // Store all the (x, density) coordinate pairs here.
     std::vector<std::pair<double, double>> results;
+
+    if (!std::isfinite(start) ||!std::isfinite(end) || !std::isfinite(step))
+{
+    throw std::invalid_argument(
+        "Range values and step must be finite."
+    );
+}
 
     // The step must be positive.
     if (step <= 0)
