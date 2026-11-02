@@ -49,21 +49,9 @@ std::string formatNumber(
 
 }
 
-void Plot::setXLabel(const std::string& label) {
-    x_label_ = label;
-}
-
-void Plot::setYLabel(const std::string& label) {
-    y_label_ = label;
-}
-
-void Plot::setTitle(const std::string& title) {
-    title_ = title;
-}
-
 CountPlot::CountPlot(
     const std::vector<std::string>& categories
-) : categories_(categories) {
+) : Plot("Count Plot", "Category", "Count"), categories_(categories) {
 }
 
 void CountPlot::setBarColor(Color color) {

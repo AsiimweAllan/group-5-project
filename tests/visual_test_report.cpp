@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+using namespace dataviz;
+
 namespace {
 
 bool axisChecks(AxisData& axis, double& midpoint) {
@@ -140,7 +142,7 @@ int main() {
     AxisData axis;
     double midpoint = 0.0;
     const bool axisPassed = axisChecks(axis, midpoint);
-    projectname::CsvDataLoader loader("scores.csv");
+    dataviz::CsvDataLoader loader("scores.csv");
     loader.load();
     const auto rows = loader.getData();
     const bool csvPassed = csvChecks(rows);

@@ -20,7 +20,7 @@ string write_temp_file(const string& name, const string& contents) {
 }
 
 Grid load_csv_file(const string& name) {
-    projectname::CsvDataLoader loader(name);
+    dataviz::CsvDataLoader loader(name);
     loader.load();
     return loader.getData();
 }

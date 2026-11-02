@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 using namespace std;
+using namespace dataviz;
 namespace {
 
 constexpr double kKernelPi = 3.14159;

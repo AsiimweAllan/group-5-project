@@ -3,6 +3,8 @@
 #include <stdexcept> // works on invalid inputs like 0.
 constexpr double PI = 3.14159;
 
+namespace dataviz {
+
 // our constructor
 KDE::KDE(const std::vector<double>& data, double bandwidth) : data(data), bandwidth(bandwidth){
 
@@ -73,3 +75,5 @@ std::vector<std::pair<double, double>> KDE::evaluateRange(
 
     return results;
 }
+
+} // namespace dataviz
