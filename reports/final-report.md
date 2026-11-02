@@ -75,15 +75,15 @@ The six registered tests cover `KDE`, `AxisData`, `CsvDataLoader`, `TextHistogra
 
 ## 7. Team contributions and collaboration
 
-| Member | Reported focus | Evidence and contribution confirmation |
-| --- | --- | --- |
+| Member | Reported focus |
+| --- | --- | 
 | Asiimwe Allan Mark | Integration, review, coordination, and test evidence. 
 | Akora Sheenaz N | CSV loading and numeric-column handling. 
 | Baryashaba Ruth | Axis interface and scaling. 
 | Kabega Nestroy | KDE class and evaluation. 
 | Lena Stacy | Histogram class and bin behavior. 
 | Kabayaga Davinah | Categorical CountPlot. 
-| Kasai Hawla | Data-cleaning requirements and validation proposal. | [Member: identify whether this was a proposal or implementation, with evidence.] |
+| Kasai Hawla | Data-cleaning requirements and validation proposal.
 | Ainebyoona Joshua | Test plan and execution record. 
 | Agola Jolly Martha | Examples and usage guide. 
 
