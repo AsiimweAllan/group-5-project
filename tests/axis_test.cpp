@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+using namespace dataviz;
+
 int main() {
     AxisData axis;
     assert(axis.getMinValue() == 0.0);

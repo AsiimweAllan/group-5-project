@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <utility>
+
+namespace dataviz {
 // KDE = Kernel Density Estimation
 // This class shows where our data is concentrated mostly in a given set of numerical values.
 
@@ -24,4 +26,6 @@ public:
 ) const;
 
 };
+
+} // namespace dataviz
 #endif

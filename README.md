@@ -1,6 +1,6 @@
 # Group 5 C++ Data Visualization Project
 
-A C++17 learning project for reading simple CSV data and exploring reusable components for data analysis and visualization. The repository contains CSV loading, axis scaling, kernel density estimation (KDE), a standalone text histogram, examples, and CMake-based tests.
+A C++17 learning project that provides a reusable `dataviz` library for loading simple CSV data and exploring data-analysis and visualization components. The library target contains CSV loading, axis scaling, kernel density estimation (KDE), a text histogram, and categorical CountPlot SVG rendering. `library_demo` shows several components through the shared library target.
 
 ## Project goals
 
@@ -14,22 +14,22 @@ A C++17 learning project for reading simple CSV data and exploring reusable comp
 - `CsvDataLoader` reads comma-separated text into rows of strings.
 - `AxisData` stores an axis range, label, ticks, and tick labels; `scaleValue` maps a value into a normalized position.
 - `KDE` calculates Gaussian kernel density estimates for numeric input.
-- `src/histogram` is a standalone program that prints a text histogram.
-- CMake builds four registered test programs for the CSV loader, axis scaling, KDE, and a combined visual test report.
+- `TextHistogram` counts integer observations and returns a text representation.
+- `CountPlot` counts categories and returns SVG markup.
+- CMake builds the `dataviz` library and links six registered test programs to it, covering CSV loading, axis scaling, KDE, histogram, CountPlot, and a visual report.
 
-The current CMake configuration builds the test programs. The repository does not yet build all components as one integrated, installed visualization library. The text histogram is also separate from the CMake test targets. See [tests/README.md](tests/README.md) for the exact test coverage and histogram instructions.
+The `dataviz` target provides a public include directory and can be installed with CMake. See [tests/README.md](tests/README.md) for test coverage and [examples/library_demo.cpp](examples/library_demo.cpp) for a consumer example.
 
 ## Project layout
 
 | Path | Contents |
 | --- | --- |
 | `include/` | Public headers for the components |
-| `src/` | Component implementations and standalone histogram source |
+| `src/` | Implementations compiled into the `dataviz` library |
 | `examples/` | Small programs demonstrating project components |
 | `tests/` | CMake test targets, test sources, and a CSV fixture |
 | `data/` | Data files and output folder used by project work |
 | `reports/` | Group and individual reports, figures, and project documentation |
-| `cmake/` | CMake package configuration template |
 
 ## Requirements
 
@@ -64,6 +64,8 @@ The registered tests are:
 | `kde_unit_test` | KDE density values and invalid inputs |
 | `axis_unit_test` | Axis defaults, range and label accessors, and value scaling |
 | `data_loader_unit_test` | CSV fixture, row parsing, blank fields, and missing-file behavior |
+| `histogram_unit_test` | Integer frequencies, rendered text, negative values, and empty input |
+| `countplot_unit_test` | Counts, summary, SVG output/escaping, and invalid rendering cases |
 | `visual_test_report` | Axis midpoint and CSV fixture checks; creates an HTML and SVG summary |
 
 After the visual test runs, open the report with:
@@ -75,13 +77,28 @@ Start-Process -FilePath '.\build-testing\test-results\index.html'
 ## Current limitations
 
 - The CSV loader splits fields at commas and does not support quoted commas or multiline quoted fields.
-- The histogram is a standalone text program rather than an integrated library component.
 - KDE results are numeric; the KDE test does not draw a density curve.
-- CountPlot and other planned chart components are not currently part of the registered CMake test suite.
+
+
+## Member Contributions
+
+| Member | Reported contribution | Commit evidence |
+|---|---|---|
+| Asiimwe Allan Mark | Project setup, integration, coordination, and testing | `703a803`, `cb7304b`, `1894ad3` |
+| Akora Sheenaz N | CSV data loading | `f8fa532`, `869ef65`, `24bb970` |
+| Baryashaba Ruth | Axis interface and scaling | `002dcf0`, `8bd304c`, `065e3e8` |
+| Kabega Nestroy | KDE implementation and evaluation | `d2c50d0`, `2f1ab05`, `ec23d2b` |
+| Stacy-Lena | Histogram work | `2a020b2`, `e6f1208` |
+| Kabayaga Davinah | CountPlot and SVG visualization | `fad62a6`, `ccf18ed`, `c146bf9` |
+| Kasai Hawla | Data-cleaning proposal and CountPlot work | `f7cdf06`, `e287ac9`, `8d20616` |
+| Ainebyoona Joshua | Test work | `113a704` |
+| Agola Jolly Martha | Examples and usage guidance | `1c6d4c4`, `ce8b440`, `7d014e6` |
+We can check commits using
+git show --stat number
 
 ## AI use
 
-AI tools were used as development support to explain CMake and the project’s test structure, help diagnose the mismatch between the CSV loader tests and the `CsvDataLoader` class interface, and revise project documentation. The updated tests were rebuilt and run with CTest. Group members are responsible for reviewing, understanding, and approving AI-assisted changes before submitting the project.
+AI tools were used as development support to explain CMake and the project’s test structure, help diagnose the CSV loader interface, and revise documentation as well as assisting in building different features that were out of the learning scope.
 
 ## References
 

@@ -1,11 +1,11 @@
-#include "../include/data_loader.hpp"
+#include "data_loader.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 
 using namespace std;
 
-namespace projectname {
+namespace dataviz {
 
 // Base class constructor definition
 DataLoader::DataLoader(const string& file) : filename(file) {}
@@ -43,4 +43,4 @@ void CsvDataLoader::load() {
     }
 }
 
-} // namespace projectname
+} // namespace dataviz

@@ -5,30 +5,33 @@
 
 namespace dataviz {
 
-// Parent class for plots that can describe their results.
+// Shared interface and common labels for plots in the library.
 class Plot {
 protected:
-    // Subclasses can use the title, but the rest of the program cannot edit it directly.
     std::string title_;
+    std::string x_label_;
+    std::string y_label_;
 
 public:
-    explicit Plot(const std::string& title) : title_(title) {}
+    explicit Plot(const std::string& title = "Plot",
+                  const std::string& xLabel = "",
+                  const std::string& yLabel = "")
+        : title_(title), x_label_(xLabel), y_label_(yLabel) {}
 
-    void setTitle(const std::string& title) {
-        title_ = title;
-    }
-
-    std::string getTitle() const {
-        return title_;
-    }
-
-    // Each child class must decide how it describes its own results.
-    virtual std::string summary() const = 0;
-
-    // A base class used polymorphically needs a virtual destructor.
     virtual ~Plot() = default;
+
+    void setTitle(const std::string& title) { title_ = title; }
+    void setXLabel(const std::string& label) { x_label_ = label; }
+    void setYLabel(const std::string& label) { y_label_ = label; }
+
+    const std::string& getTitle() const { return title_; }
+    const std::string& getXLabel() const { return x_label_; }
+    const std::string& getYLabel() const { return y_label_; }
+
+    virtual std::string summary() const = 0;
+    virtual std::string renderSVG(int width = 800, int height = 500) const = 0;
 };
 
-}
+} // namespace dataviz
 
-#endif
+#endif // DATAVIZ_PLOT_HPP

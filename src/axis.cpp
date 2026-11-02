@@ -2,6 +2,8 @@
 #include "axis.hpp"
 #include <iostream>
 
+namespace dataviz {
+
 using namespace std;
 
 
@@ -123,3 +125,5 @@ double scaleValue(const AxisData& axis, double value) {
 
     return (value - min) / (max - min);
 }
+
+} // namespace dataviz

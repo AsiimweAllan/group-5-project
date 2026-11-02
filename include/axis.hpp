@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+namespace dataviz {
+
 // Base class representing an axis in a data visualization
 class AxisData {
 private:
@@ -56,5 +58,7 @@ public:
 // Standalone utility functions
 void printAxis(const AxisData& axis);
 double scaleValue(const AxisData& axis, double value);
+
+} // namespace dataviz
 
 #endif // DATAVIZ_AXIS_HPP

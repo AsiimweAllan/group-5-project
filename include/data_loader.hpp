@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace projectname {
+namespace dataviz {
 
 class DataLoader {
 protected: // <-- CRITICAL: Must be protected, NOT private
@@ -25,6 +25,6 @@ public:
     void load() override; // Overrides the load function
 };
 
-} // namespace projectname
+} // namespace dataviz
 
 #endif
