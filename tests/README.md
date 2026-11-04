@@ -4,19 +4,19 @@ The current CMake project builds the shared `dataviz` library, a consumer exampl
 
 ## Configure and build
 
-From the project root in PowerShell, configure using the compiler installed on your machine. For MSYS2 UCRT64 MinGW:
+From the project root in PowerShell, configure with the compiler installed on your machine. This example discovers `g++` from `PATH` and uses a fresh build directory so it does not reuse another computer's CMake compiler cache:
 
 ```powershell
-cmake -S . -B build-testing -G "MinGW Makefiles" `
-  -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe `
-  -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe
-cmake --build build-testing --parallel 4
+$compiler = (Get-Command g++).Source
+cmake -S . -B build-local -G "MinGW Makefiles" `
+  -DCMAKE_CXX_COMPILER="$compiler"
+cmake --build build-local --parallel 4
 ```
 
 Run the registered tests after the build succeeds:
 
 ```powershell
-ctest --test-dir build-testing --output-on-failure
+ctest --test-dir build-local --output-on-failure
 ```
 
 ## Registered coverage

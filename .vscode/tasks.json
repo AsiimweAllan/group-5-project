@@ -4,10 +4,10 @@
         {
             "label": "CMake: Build Group 5 tests",
             "type": "process",
-            "command": "C:\\Program Files\\CMake\\bin\\cmake.exe",
+            "command": "cmake",
             "args": [
                 "--build",
-                "${workspaceFolder}/build-testing",
+                "${workspaceFolder}/build-local",
                 "--parallel",
                 "4"
             ],
@@ -24,10 +24,10 @@
         {
             "label": "CTest: Run Group 5 tests",
             "type": "process",
-            "command": "C:\\Program Files\\CMake\\bin\\ctest.exe",
+            "command": "ctest",
             "args": [
                 "--test-dir",
-                "${workspaceFolder}/build-testing",
+                "${workspaceFolder}/build-local",
                 "--output-on-failure"
             ],
             "options": {

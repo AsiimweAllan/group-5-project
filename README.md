@@ -37,24 +37,26 @@ The `dataviz` target provides a public include directory and can be installed wi
 - A C++17 compiler
 - A CMake-supported build tool
 
-The commands below use MSYS2 UCRT64 MinGW on Windows. Change the compiler and make paths if MSYS2 is installed elsewhere.
+The commands below use a MinGW compiler available on `PATH`. If your compiler is installed elsewhere, set `CMAKE_CXX_COMPILER` to its actual path as shown below. Each computer needs its own fresh build directory because CMake caches the selected compiler path.
 
 ## Build and run the tests
 
 Open PowerShell in the project root and run:
 
 ```powershell
-cmake -S . -B build-testing -G "MinGW Makefiles" `
-  -DCMAKE_CXX_COMPILER=C:/msys64/ucrt64/bin/g++.exe `
-  -DCMAKE_MAKE_PROGRAM=C:/msys64/ucrt64/bin/mingw32-make.exe
-cmake --build build-testing --parallel 4
-ctest --test-dir build-testing --output-on-failure
+$compiler = (Get-Command g++).Source
+cmake -S . -B build-local -G "MinGW Makefiles" `
+  -DCMAKE_CXX_COMPILER="$compiler"
+cmake --build build-local --parallel 4
+ctest --test-dir build-local --output-on-failure
 ```
+
+If `Get-Command g++` cannot find the compiler, install a C++17 MinGW toolchain or add its `bin` folder to `PATH`, then open a new terminal. For an existing build folder that reports a missing compiler, configure into a new folder such as `build-local` instead of reusing the old cache.
 
 Run CTest only after the build completes successfully. To run one test, add its name filter; for example:
 
 ```powershell
-ctest --test-dir build-testing --output-on-failure -R "^kde_unit_test$"
+ctest --test-dir build-local --output-on-failure -R "^kde_unit_test$"
 ```
 
 The registered tests are:
