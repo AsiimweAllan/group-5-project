@@ -3,6 +3,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace dataviz;
 
 int main() {
     // 1. Demonstrate the original AxisData class

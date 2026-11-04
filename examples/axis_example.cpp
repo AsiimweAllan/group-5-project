@@ -1,20 +1,18 @@
 #include "axis.hpp"
+#include <iostream>
+
+using namespace dataviz;
 
 int main() {
-    // Create an AxisData variable
-    AxisData Axis;
+    AxisData axis;
 
-    // Assign basic settings
-    Axis.minValue = 0;
-    Axis.maxValue = 100;
-    Axis.axisLabel = "Score";
+    axis.setRange(0, 100);
+    axis.setAxisLabel("Score");
+    axis.setTicks({0, 20, 40, 60, 80, 100});
+    axis.setLabels({"0", "20", "40", "60", "80", "100"});
 
-    // Add numbers and labels
-    
-    Axis.labels = {"0", "20", "40", "60", "80", "100"};
-
-    // Display everything on screen
-    printAxis(Axis);
+    printAxis(axis);
+    std::cout << "A score of 50 scales to: " << scaleValue(axis, 50) << '\n';
 
     return 0;
 }

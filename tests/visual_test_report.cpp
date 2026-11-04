@@ -1,15 +1,33 @@
 #include "axis.hpp"
 #include "data_loader.hpp"
 
-#include <filesystem>
+#include <cerrno>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
+
+#if defined(_WIN32)
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 
 using namespace dataviz;
 
 namespace {
+
+void ensureTestResultsDirectory() {
+#if defined(_WIN32)
+    const int result = _mkdir("test-results");
+#else
+    const int result = mkdir("test-results", 0755);
+#endif
+    if (result != 0 && errno != EEXIST)
+        throw std::runtime_error("Cannot create test-results directory");
+}
 
 bool axisChecks(AxisData& axis, double& midpoint) {
     axis.setRange(0.0, 100.0);
@@ -30,7 +48,7 @@ bool csvChecks(const std::vector<std::vector<std::string>>& rows) {
 
 void writeSvgReport(const std::vector<std::vector<std::string>>& rows,
                     bool axisPassed, bool csvPassed, double midpoint) {
-    std::filesystem::create_directories("test-results");
+    ensureTestResultsDirectory();
     std::ofstream svg("test-results/summary.svg");
     if (!svg) throw std::runtime_error("Cannot create test-results/summary.svg");
     const bool allPassed = axisPassed && csvPassed;
@@ -75,7 +93,7 @@ void writeSvgReport(const std::vector<std::vector<std::string>>& rows,
 
 void writeReport(const std::vector<std::vector<std::string>>& rows,
                  bool axisPassed, bool csvPassed, double midpoint) {
-    std::filesystem::create_directories("test-results");
+    ensureTestResultsDirectory();
     std::ofstream html("test-results/index.html");
     if (!html) throw std::runtime_error("Cannot create test-results/index.html");
 

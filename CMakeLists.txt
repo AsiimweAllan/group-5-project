@@ -64,6 +64,12 @@ set_tests_properties(visual_test_report PROPERTIES
 add_executable(library_demo examples/library_demo.cpp)
 target_link_libraries(library_demo PRIVATE dataviz::dataviz)
 
+add_executable(axis_example src/axis_example.cpp)
+target_link_libraries(axis_example PRIVATE dataviz::dataviz)
+
+add_executable(axis_example_basic examples/axis_example.cpp)
+target_link_libraries(axis_example_basic PRIVATE dataviz::dataviz)
+
 install(TARGETS dataviz EXPORT datavizTargets)
 install(DIRECTORY include/ DESTINATION include)
 install(EXPORT datavizTargets
